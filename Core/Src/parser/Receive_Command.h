@@ -5,7 +5,8 @@
 #include <cstdint>
 #include "Command.h"
 
-#define MESSAGE_SIZE 70
+#define MESSAGE_SIZE 100
+
 
 namespace parser
 {
@@ -19,6 +20,8 @@ class Receive_Command : public Command
 		static Receive_Command* parse(const char* const arg_str);
 
 	char message[MESSAGE_SIZE];
+	char expected_message[MESSAGE_SIZE];
+	uint32_t baud_rate = 0;
 };
 
 }

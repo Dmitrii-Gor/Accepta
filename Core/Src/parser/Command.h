@@ -10,7 +10,7 @@ class Command {
 
 public:
 	virtual ~Command();
-	static constexpr int COMMAND_STRING_LENGHT = 80;
+	static constexpr int COMMAND_STRING_LENGHT = 100;
 	static constexpr int BUFFER_SIZE = COMMAND_STRING_LENGHT + 1;
 	static Command* parse( const char* const cmd_str );
 	virtual void execute( void ) = 0;

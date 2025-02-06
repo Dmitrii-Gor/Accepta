@@ -47,22 +47,22 @@ Command* Command::parse(const char *const cmd_str)
 
 	// командная строка начинается с литеры '#'
 	const char *p = cmd_str + 1;
-	if (!strncmp(p, DO_CMD, strlen(DO_CMD)))	// команда DO
+	if (!strncmp(p, DO_CMD, strlen(DO_CMD)))	// команда DO Вид: #D0 номер_пина=значение
 	{
 		p += strlen(DO_CMD);
 		return Data_Output_Cmd::parse(p);
 	}
-	else if (!strncmp(p, DI_CMD, strlen(DI_CMD)))	// команда DI
+	else if (!strncmp(p, DI_CMD, strlen(DI_CMD)))	// команда DI Вид: #DI номер_пина
 	{
 		p += strlen(DI_CMD);
 		return Data_Input_Cmd::parse(p);
 	}
-	else if (!strncmp(p, CS, strlen(CS))) // команда CS(Command Send)
+	else if (!strncmp(p, CS, strlen(CS))) // команда CS(Command Send) Вид: #CS текст / #CS текст > текст
 	{
 		p += strlen(CS);
 		return Command_Send::parse(p);
 	}
-	else if (!strncmp(p, CR, strlen(CR))) // команда CR(Command Receive
+	else if (!strncmp(p, CR, strlen(CR))) // команда CR(Command Receive) Вид: #CR=baud_rate текст > текст_ожидаемый_в_ответе
 	{
 		p += strlen(CR);
 		return Receive_Command::parse(p);
@@ -72,7 +72,7 @@ Command* Command::parse(const char *const cmd_str)
 		p += strlen(PWM_ON_CMD);
 		return PWM_On_Cmd::parse(p);
 	}
-	else if (!strncmp(p, SRV_CMD, strlen(SRV_CMD)))	// команда SRV
+	else if (!strncmp(p, SRV_CMD, strlen(SRV_CMD)))	// команда SRV Вид: #SRV номер_канала=угол мин_значение_мкс макс_значение_мкс макс_угол
 	{
 		p += strlen(SRV_CMD);
 		return Srv_Mov_Cmd::parse(p);
