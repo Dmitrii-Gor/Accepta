@@ -1,10 +1,13 @@
 #include "keyboard_usbd_hid.h"
-#include "usb_device.h"
+#include "usbd_hid.h"
+#include <stdbool.h>
 
 
 #define KEYCODE_TABLE_SIZE 49
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
+
+bool command_first = 0;
 
 typedef struct
 {
@@ -125,7 +128,7 @@ void press_enter()
 }
 
 
-void write_command(const char* str)
+void write_text(const char* str)
 {
     while (*str)
     {
@@ -152,14 +155,100 @@ void write_command(const char* str)
     }
 }
 
+void write_command(const char* str) {
+    uint8_t modifier_button = 0x00; // Для модификаторов (CTRL, ALT, SHIFT)
+    uint8_t keycode = 0x00;         // Для функциональных клавиш (например, F4)
+    uint8_t keycode_2 = 0x00;       // Для символов
+    uint8_t modifier_character = 0x00; // Для символов, требующих модификатор
+
+    char filtered_string[256] = {0}; // Новая строка без модификаторов и F-клавиш
+    size_t filtered_index = 0;
+
+    // Проверяем наличие флага command_first
+    size_t len = 0;
+    if (command_first) {
+        len = strlen(str) - 3; // Убираем флаг "-f" из строки
+        command_first = 0;
+    } else {
+        len = strlen(str);
+    }
+
+    // Обработка исходной строки
+    while (*str && len--) {
+        // Проверяем модификаторы
+        if (strstr(str, "alt")) {
+            modifier_button |= 0x04; // ALT
+            str += 3;
+        } else if (strstr(str, "ctrl")) {
+            modifier_button |= 0x01; // CTRL
+            str += 4;
+        } else if (strstr(str, "shift")) {
+            modifier_button |= 0x02; // SHIFT
+            str += 5;
+        } else if (strstr(str, "f") == str && *(str + 1) >= '1' && *(str + 1) <= '9') {
+            keycode = (*(str + 1) - '0' - 1) + 0x3A; // F1-F9
+            str += 2;
+        } else if (strstr(str, "f10") == str) {
+            keycode = 0x43; // F10
+            str += 3;
+        } else if (strstr(str, "f11") == str) {
+            keycode = 0x57; // F11
+            str += 3;
+        } else if (strstr(str, "f12") == str) {
+            keycode = 0x58; // F12
+            str += 3;
+        } else if (*str == ' ') {
+        	while(*str == ' ') {
+        		str++;
+        		continue;
+        	}
+        }
+        else {
+            // Копируем оставшиеся символы в новую строку
+            filtered_string[filtered_index++] = *str;
+        }
+
+    }
+
+    filtered_string[filtered_index] = '\0'; // Завершаем строку
+
+    // Проходим по оставшейся строке и обрабатываем символы, если есть
+    str = filtered_string;
+    if (*str) {
+        keycode_2 = get_hid_keycode(*str, &modifier_character);
+    }
+
+    // Отправляем комбинацию
+    HAL_Delay(200);
+    keyboardhid.MODIFIER = modifier_button;
+    keyboardhid.KEYCODE1 = keycode;
+    keyboardhid.KEYCODE2 = keycode_2;
+
+    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+    HAL_Delay(50);
+
+    // Освобождаем клавиши
+    keyboardhid.MODIFIER = 0x00;
+    keyboardhid.KEYCODE1 = 0x00;
+    keyboardhid.KEYCODE2 = 0x00;
+
+    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+}
+
+
 
 void send_command_to_device(const char* message)
 {
-	    const char* part1 = message;
-	    const char* part2 = strchr(message, '>');
 
-	    if (part2) // Если '>' найден, разделить строку на две части
+	    const char* part1 = message;
+	    const char* part2 = strchr(message, '#');
+
+	    if (part2) // Если '#' найден, разделить строку на две части
 	    {
+
+	    	if(strstr(message, "-f")) {
+	    		command_first = 1;
+	    	}
 
 	        size_t part1_len = part2 - part1;
 	        char cmd1[part1_len + 1];
@@ -168,71 +257,26 @@ void send_command_to_device(const char* message)
 
 	        const char* cmd2 = part2 + 1;
 
-	        write_command(cmd1);
-	        press_enter();
-
-	        write_command(cmd2);
-	        press_enter();
+	        if(command_first) {
+	        	write_command(cmd2);
+	        	write_text(cmd1);
+	        	press_enter();
+	        }
+	        else {
+	        	write_text(cmd1);
+	        	press_enter();
+	        	write_command(cmd2);
+	        }
 	    }
 	    else
 	    {
-	    	write_command(message);
+	    	write_text(message);
 	        press_enter();
 	    }
 }
 
 
-void open_terminal_linux()
-{
 
-
-	keyboardhid.MODIFIER = 0x01;
-	keyboardhid.KEYCODE1 = 0x0C;
-    HAL_Delay(150);
-
-    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-
-    HAL_Delay(150);
-
-    keyboardhid.MODIFIER = 0x00;
-    keyboardhid.KEYCODE1 = 0x00;
-
-
-    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-
-}
-
-void close_terminal_linux()
-{
-
-	keyboardhid.MODIFIER = 0x01;
-	keyboardhid.KEYCODE1 = 0x06;
-
-    HAL_Delay(150);
-
-	USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-
-    HAL_Delay(150);
-
-	keyboardhid.MODIFIER = 0x00;
-	keyboardhid.KEYCODE1 = 0x00;
-
-    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-
-	keyboardhid.MODIFIER = 0x04;
-	keyboardhid.KEYCODE1 = 0x3D;
-    HAL_Delay(150);
-
-    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-
-    HAL_Delay(150);
-
-    keyboardhid.MODIFIER = 0x00;
-    keyboardhid.KEYCODE1 = 0x00;
-
-    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-
-}
 
 
 
