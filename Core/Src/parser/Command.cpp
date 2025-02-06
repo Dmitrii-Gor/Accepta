@@ -6,6 +6,9 @@
 #include <cstring>
 #include <iostream>
 
+#include "Receive_Command.h"
+#include "Send_Command.h"
+
 namespace parser
 {
 
@@ -13,6 +16,8 @@ static const char *DO_CMD = "DO";
 static const char *DI_CMD = "DI";
 static const char *PWM_ON_CMD = "PWM_ON";
 static const char *SRV_CMD = "SRV";
+static const char *CS = "CS";
+static const char *CR = "CR";
 
 Command::~Command()
 {
@@ -51,6 +56,16 @@ Command* Command::parse(const char *const cmd_str)
 	{
 		p += strlen(DI_CMD);
 		return Data_Input_Cmd::parse(p);
+	}
+	else if (!strncmp(p, CS, strlen(CS))) // команда CS(Command Send)
+	{
+		p += strlen(CS);
+		return Command_Send::parse(p);
+	}
+	else if (!strncmp(p, CR, strlen(CR))) // команда CR(Command Receive
+	{
+		p += strlen(CR);
+		return Receive_Command::parse(p);
 	}
 	else if (!strncmp(p, PWM_ON_CMD, strlen(PWM_ON_CMD)))	// команда PWM_ON
 	{
