@@ -17,14 +17,13 @@ public:
 
 	uint8_t channel = 0;
 	uint16_t angle = 0;
-	static uint16_t degree_to_width(uint16_t angle);
-	static constexpr uint16_t MIN_WIDTH = 544;
-	static constexpr uint16_t MAX_WIDTH = 2344;
+	uint16_t MIN_WIDTH = 0;
+	uint16_t MAX_WIDTH = 0;
+	uint16_t MAX_ANGLE = 0;
 
 private:
 	static constexpr uint8_t MIN_CHANNEL = 0;
 	static constexpr uint8_t MAX_CHANNEL = 1;
-	static constexpr uint8_t MAX_ANGLE = 180;
 };
 
 } /* namespace parser */

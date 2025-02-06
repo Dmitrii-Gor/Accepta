@@ -21,11 +21,10 @@ Data_Input_Cmd::~Data_Input_Cmd() {
 
 void Data_Input_Cmd::execute()
 {
-	static char buf[2];
+	static char buf[3];
 	bool p = get_digital_pin(channel);
 	buf[0] = p ? '1' : '0';
-	buf[1] = '\r';
-	buf[2] = '\0';
+	buf[1] = '\0';
 	console_out(buf);
 }
 

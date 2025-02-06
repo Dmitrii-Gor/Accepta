@@ -16,7 +16,7 @@ static const char *main_loop_task_name = "main_loop";
 static StackType_t main_loop_task_stack_buffer[ MAIN_LOOP_TASK_STACK_DEPTH ];
 static StaticTask_t main_loop_task_TCB;
 
-#define BUFFER_SIZE 81
+#define BUFFER_SIZE 80
 static char buffer[BUFFER_SIZE];
 
 static char get_char(void)
@@ -58,44 +58,12 @@ static const char* get_cmd_str(void)
 
 static void main_loop( void * pvParameters )
 {
-	uint16_t const red_up = 0x6A0;
-	uint16_t const red_down = 0x280;
-	uint16_t const white_up = 0x5D0;
-	uint16_t const white_down = 0x280;
-	uint16_t pos;
-	TIM4 -> CCR3 = red_up;
 	for (;;)
 	{
 		// получить командную строку от хоста
 		get_cmd_str();
 		// выполнить полученную строку
 		execute_command(buffer);
-#if 0
-		vTaskDelay(5000);
-		for (pos = red_up; pos > red_down; pos -= 5)
-		{
-			TIM4 -> CCR3 = pos;
-			vTaskDelay(2);
-		}
-		vTaskDelay(5000);
-		for (pos = red_down; pos < red_up; pos += 1)
-		{
-			TIM4 -> CCR3 = pos;
-			vTaskDelay(2);
-		}
-		vTaskDelay(5000);
-		for (pos = white_up; pos > white_down; pos -= 5)
-		{
-			TIM4 -> CCR4 = pos;
-			vTaskDelay(2);
-		}
-		vTaskDelay(5000);
-		for (pos = white_down; pos < white_up; pos += 1)
-		{
-			TIM4 -> CCR4 = pos;
-			vTaskDelay(2);
-		}
-#endif
 	}
 }
 

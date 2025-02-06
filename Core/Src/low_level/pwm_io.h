@@ -8,7 +8,8 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-void set_pwm_width(uint8_t channel, uint16_t width);
+void set_pwm_width(uint8_t channel, uint16_t angle, uint16_t min_width, uint16_t max_width, uint16_t max_angle);
+uint16_t degree_to_width(uint16_t angle, uint16_t min_width, uint16_t max_width, uint16_t max_angle);
 
 #ifdef __cplusplus
 }
