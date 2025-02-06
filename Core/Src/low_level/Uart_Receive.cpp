@@ -33,11 +33,11 @@ void command_receive_cmd(uint32_t baud_rate, const char* str, const char* expect
             HAL_UART_Transmit(&huart3, (uint8_t*)"\r\nResponse OK\n\r", 13, HAL_MAX_DELAY);
         }
         else {
-            HAL_UART_Transmit(&huart3, (uint8_t*)"\r\nResponse Mismatch\n\r", 19, HAL_MAX_DELAY);
+            HAL_UART_Transmit(&huart3, (uint8_t*)"Response Mismatch\r\n", 19, HAL_MAX_DELAY);
         }
     }
     else {
-        HAL_UART_Transmit(&huart3, (uint8_t*)"No Response\n\r", 13, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&huart3, (uint8_t*)"No Response\r\n", 13, HAL_MAX_DELAY);
     }
 
 	memset(buffer, 0, sizeof(buffer));
