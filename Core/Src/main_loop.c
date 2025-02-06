@@ -16,7 +16,7 @@ static const char *main_loop_task_name = "main_loop";
 static StackType_t main_loop_task_stack_buffer[ MAIN_LOOP_TASK_STACK_DEPTH ];
 static StaticTask_t main_loop_task_TCB;
 
-#define BUFFER_SIZE 80
+#define BUFFER_SIZE 100
 static char buffer[BUFFER_SIZE];
 
 static char get_char(void)

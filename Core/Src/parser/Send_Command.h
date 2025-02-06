@@ -4,7 +4,7 @@
 #include <cstdint>
 #include "Command.h"
 
-#define MESSAGE_SIZE 70
+#define MESSAGE_SIZE 100
 
 namespace parser
 {
