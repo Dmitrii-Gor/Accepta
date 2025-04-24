@@ -57,9 +57,9 @@ Command* Command::parse(const char *const cmd_str)
 		p += strlen(DI_CMD);
 		return Data_Input_Cmd::parse(p);
 	}
-	else if (!strncmp(p, CS, strlen(CS))) // команда CS(Command Send) Вид: #CS текст / #CS текст > текст
-	{
-		p += strlen(CS);
+	else if (!strncmp(p, CS, strlen(CS))) // команда CS(Command Send) Вид: #CS текст / #CS текст # сочетание клавиш
+	{									  // (также поддерживается флаг -f, выполняет команду первой)
+		p += strlen(CS);				  // (пример: #CS help me pls #alt f4 -f)
 		return Command_Send::parse(p);
 	}
 	else if (!strncmp(p, CR, strlen(CR))) // команда CR(Command Receive) Вид: #CR=baud_rate текст > текст_ожидаемый_в_ответе
@@ -67,7 +67,7 @@ Command* Command::parse(const char *const cmd_str)
 		p += strlen(CR);
 		return Receive_Command::parse(p);
 	}
-	else if (!strncmp(p, PWM_ON_CMD, strlen(PWM_ON_CMD)))	// команда PWM_ON
+	else if (!strncmp(p, PWM_ON_CMD, strlen(PWM_ON_CMD)))	// команда PWM_ON channel,state(0/1), pwm_width
 	{
 		p += strlen(PWM_ON_CMD);
 		return PWM_On_Cmd::parse(p);

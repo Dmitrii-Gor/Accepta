@@ -16,13 +16,14 @@ public:
 	static PWM_On_Cmd* parse(const char* const arg_str);
 
 	uint8_t channel = 0;
+	uint16_t pulse_width = 0;
 	bool isOn = false;
 
 private:
 	static constexpr uint8_t MIN_CHANNEL = 0;
 	static constexpr uint8_t MAX_CHANNEL = 1;
-	static constexpr char STATE_ON = '1';
-	static constexpr char STATE_OFF = '0';
+	static constexpr uint8_t STATE_ON = 1;
+	static constexpr uint8_t STATE_OFF = 0;
 };
 
 }

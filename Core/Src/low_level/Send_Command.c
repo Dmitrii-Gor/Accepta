@@ -1,5 +1,4 @@
 #include "keyboard_usbd_hid.h"
-#include "usbd_hid.h"
 #include <stdbool.h>
 
 
@@ -185,6 +184,9 @@ void write_command(const char* str) {
         } else if (strstr(str, "shift")) {
             modifier_button |= 0x02; // SHIFT
             str += 5;
+        } else if (strstr(str, "tab")) {  // TAB
+            keycode = 0x2B;
+            str += 3;
         } else if (strstr(str, "f") == str && *(str + 1) >= '1' && *(str + 1) <= '9') {
             keycode = (*(str + 1) - '0' - 1) + 0x3A; // F1-F9
             str += 2;
@@ -198,16 +200,14 @@ void write_command(const char* str) {
             keycode = 0x58; // F12
             str += 3;
         } else if (*str == ' ') {
-        	while(*str == ' ') {
-        		str++;
-        		continue;
-        	}
+            while(*str == ' ') {
+                str++;
+                continue;
+            }
         }
         else {
-            // Копируем оставшиеся символы в новую строку
             filtered_string[filtered_index++] = *str;
         }
-
     }
 
     filtered_string[filtered_index] = '\0'; // Завершаем строку

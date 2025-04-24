@@ -107,18 +107,19 @@ int main(void)
   MX_SPI4_Init();
   MX_SPI6_Init();
   MX_TIM4_Init();
-  MX_TIM9_Init();
   MX_UART5_Init();
   MX_UART7_Init();
   MX_USART3_UART_Init();
   MX_USART6_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   htim4.Instance->CCR3 = 500; // задаем стартовое значение для сервопривода в мкс (ширина импульса) чтобы получить 0 угол
   htim4.Instance->CCR4 = 500; //
-
   main_loop_create_task();
   //uint8_t data= 9;
 
